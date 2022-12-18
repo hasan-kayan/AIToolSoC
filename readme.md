@@ -1,1 +1,1 @@
-# Hasan
+# AI based Battery SoC Estimation Tool.
