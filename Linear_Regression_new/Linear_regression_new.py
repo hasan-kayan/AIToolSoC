@@ -7,6 +7,7 @@ import os
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
+from time import perf_counter
 
 def line(x,a,b):
     return ((a*x) + b)
@@ -42,11 +43,15 @@ for i in range(len(paths_list)):
         class_data_list[i].data['Current'] = int(filenames_list[i][0:2]) 
     
 i = 0
+time = []
 for i in range(len(class_data_list)):
     regr  =linear_model.LinearRegression()
     train_test = {}
     X_train, X_test, y_train, y_test = train_test_split(class_data_list[i].data['x'].values.reshape(-1,1), class_data_list[i].data['y'].values.reshape(-1,1), test_size=0.2, random_state=42)
+    
+    t0 = perf_counter()
     regr.fit(X_train,y_train)
+    time.append(perf_counter() - t0)
     y_pred = regr.predict(X_test)
     class_data_list[i].coef = regr.coef_
     class_data_list[i].intercept = regr.intercept_
@@ -71,3 +76,18 @@ for i in range(len(class_data_list)):
     plt.grid()
 
 plt.show()
+
+i = 0
+mse = []
+r2 = []
+for i in range(len(class_data_list)):
+    mse.append(class_data_list[i].mse)
+    r2.append(class_data_list[i].r2_score*100)
+
+mse = np.array(mse)
+mse_average = np.mean(mse)
+r2 = np.array(r2)
+r2_average = np.mean(r2)
+print("mse average:     ", mse_average)
+print("r2 score average: %.4f" % r2_average + "%")
+print("Total time consumed (s)", sum(time))
